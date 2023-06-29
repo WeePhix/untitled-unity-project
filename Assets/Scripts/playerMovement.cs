@@ -9,12 +9,16 @@ public class playerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private Controls controls;
     private Vector3 dashDirection;
-    private bool canDash;
+    private float dashStart;
+    
+    [SerializeField]private bool canDash = true;
+    private bool isDashing = false;
 
     [SerializeField] private float baseSpeed;
     [SerializeField] private float dashSpeed;
     [SerializeField] private float dashDelayBefore;
-    [SerializeField] private float dashDelayAfter;
+    [SerializeField] private float dashTime;
+    [SerializeField] private float dashDecay;
     [SerializeField] private float dashCooldown;
 
     private void Awake()
@@ -40,8 +44,15 @@ public class playerMovement : MonoBehaviour
 
     void Update()
     {
-        if (controls.PlayerInput.Dash.ReadValue<float>() == 1.0 && canDash) { StartCoroutine(DashTimer()); }
-
+        if (controls.PlayerInput.Dash.ReadValue<float>() == 1.0 && canDash)
+        { 
+            StartCoroutine(DashTimer());
+            Vector3 pointerPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+            dashDirection = pointerPos - transform.position;
+            dashDirection.z = 0;
+            dashDirection = dashDirection.normalized;
+        }
+        if (isDashing) { Dash(); }
         movementInput = controls.PlayerInput.Movement.ReadValue<Vector2>();
         rb.velocity = movementInput * baseSpeed;
     }
@@ -51,8 +62,10 @@ public class playerMovement : MonoBehaviour
         controls.Disable();
         canDash = false;
         yield return new WaitForSeconds(dashDelayBefore);
-        Dash();
-        yield return new WaitForSeconds(dashDelayAfter);
+        dashStart = Time.time;
+        isDashing = true;
+        yield return new WaitForSeconds(dashTime);
+        isDashing = false;
         controls.Enable();
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
@@ -60,10 +73,7 @@ public class playerMovement : MonoBehaviour
 
     void Dash()
     {
-        Vector3 pointerPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-        dashDirection = pointerPos - transform.position;
-        dashDirection.z = 0;
-        dashDirection = dashDirection.normalized;
-        rb.AddForce(dashDirection * dashSpeed);
+        dashDecay = dashSpeed/dashTime*(Time.time - dashStart);
+        rb.AddForce(dashDirection * (dashSpeed - dashDecay));
     }
 }
