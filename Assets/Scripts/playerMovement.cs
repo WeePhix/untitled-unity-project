@@ -10,7 +10,8 @@ public class playerMovement : MonoBehaviour
     private Controls controls;
     private Vector3 dashDirection;
     private float dashStart;
-    
+    private float dashDecay;
+
     [SerializeField]private bool canDash = true;
     private bool isDashing = false;
 
@@ -18,7 +19,6 @@ public class playerMovement : MonoBehaviour
     [SerializeField] private float dashSpeed;
     [SerializeField] private float dashDelayBefore;
     [SerializeField] private float dashTime;
-    [SerializeField] private float dashDecay;
     [SerializeField] private float dashCooldown;
 
     private void Awake()
