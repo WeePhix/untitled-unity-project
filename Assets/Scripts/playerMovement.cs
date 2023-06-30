@@ -7,6 +7,7 @@ public class playerMovement : MonoBehaviour
 {
     private Vector2 movementInput;
     private Rigidbody2D rb;
+    private BoxCollider2D coll;
     private Controls controls;
     private Vector3 dashDirection;
     private float dashStart;
@@ -17,7 +18,7 @@ public class playerMovement : MonoBehaviour
 
     [SerializeField] private float baseSpeed;
     [SerializeField] private float dashSpeed;
-    [SerializeField] private float dashDelayBefore;
+    [SerializeField] private float dashDelay;
     [SerializeField] private float dashTime;
     [SerializeField] private float dashCooldown;
 
@@ -39,6 +40,7 @@ public class playerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        coll = GetComponent<BoxCollider2D>();
     }
 
 
@@ -52,7 +54,11 @@ public class playerMovement : MonoBehaviour
             dashDirection.z = 0;
             dashDirection = dashDirection.normalized;
         }
-        if (isDashing) { Dash(); }
+        if (isDashing) 
+        {
+            dashDecay = dashSpeed / dashTime * (Time.time - dashStart);
+            rb.AddForce(dashDirection * (dashSpeed - dashDecay));
+        }
         movementInput = controls.PlayerInput.Movement.ReadValue<Vector2>();
         rb.velocity = movementInput * baseSpeed;
     }
@@ -61,7 +67,7 @@ public class playerMovement : MonoBehaviour
     {
         controls.Disable();
         canDash = false;
-        yield return new WaitForSeconds(dashDelayBefore);
+        yield return new WaitForSeconds(dashDelay);
         dashStart = Time.time;
         isDashing = true;
         yield return new WaitForSeconds(dashTime);
@@ -69,11 +75,5 @@ public class playerMovement : MonoBehaviour
         controls.Enable();
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
-    }
-
-    void Dash()
-    {
-        dashDecay = dashSpeed/dashTime*(Time.time - dashStart);
-        rb.AddForce(dashDirection * (dashSpeed - dashDecay));
     }
 }
