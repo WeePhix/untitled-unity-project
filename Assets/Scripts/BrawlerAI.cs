@@ -4,88 +4,90 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class BrawlerAI : MonoBehaviour
 {
-    private Vector2 lastDir = Vector2.zero;
-    private Vector2 dirToTarget, attackDir;
-    private float distToTarget;
+    private Vector2 moveVec = Vector2.zero, targetVec, aVec;
+    private float distTarget, circ, aDecay, aStart;
+    [SerializeField] private bool isChasing = true, isAttacking = false, canAttack = true, seesTarget = false;
+
+    [SerializeField] private float bSpeed, aSpeed, aDelay, aTime, aRecover, aCooldown, aDist, marginDist;
+
+    public GameObject target, hand, weapon, attack;
+    private GameObject aCurrent;
+
     private Rigidbody2D rb;
-    private bool isChasing = true, isAttacking = false, canAttack = true, seesTarget = false;
-    private float circleDir;
-
-    [SerializeField] private float baseSpeed, attackSpeed, attackDelay, attackTime, attackRecover, attackCooldown, attackDecay, attackStart, optimalDist, distMargin;
-
-    public GameObject target, hand, weapon, attack, obstacle;
+    private DirectionManager dirMan;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        circleDir = UnityEngine.Random.value;
-        if (circleDir < 0.5) { circleDir = -90; }
-        else { circleDir = 90; }
+        dirMan = GetComponent<DirectionManager>();
+
+        circ = UnityEngine.Random.value;
+        if (circ < 0.5) { circ = -1; }
+        else { circ = 1; }
     }
 
     void Update()
     {
-        dirToTarget = target.transform.position - this.gameObject.transform.position;
-        distToTarget = dirToTarget.magnitude;
-        dirToTarget.Normalize();
+        targetVec = target.transform.position - transform.position;
+        distTarget = targetVec.magnitude;
+        targetVec.Normalize();
 
-        RaycastHit2D ray = Physics2D.Raycast(this.gameObject.transform.position, dirToTarget, distToTarget);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, targetVec, distTarget, LayerMask.GetMask("Player"));
+        Console.WriteLine(hit.collider);
+        Debug.DrawRay(transform.position, targetVec * distTarget, Color.magenta, 0);
+        if (hit.collider != null && hit.collider.gameObject.tag == "Player") { seesTarget = true; Debug.DrawRay(transform.position, targetVec * distTarget, Color.red, 0); }
+        else { seesTarget = false; }
 
-        if (ray.collider != null && ray.transform == target.transform)
-        {
-            lastDir = dirToTarget;
-            seesTarget = true;
-        }
-        else if (ray.collider != null && ray.transform == obstacle.transform) { seesTarget = false; }
-
-        if(isAttacking)
-        {
-            //attackDecay = attackSpeed / attackTime * (Time.time - attackStart);
-            rb.velocity = (( 1 - 1 / attackTime * (Time.time - attackStart)) * attackSpeed * attackDir);
-        }
-
-        if (isChasing)
-        {
-            if (Math.Abs(distToTarget - optimalDist) < distMargin) 
+        if (seesTarget) {
+            moveVec = dirMan.to8dir(targetVec);
+            if (canAttack && Mathf.Abs(distTarget - aDist) < marginDist)
             {
-                if (canAttack && seesTarget) { StartCoroutine(AttackTimer()); }
-                else
-                {
-                    lastDir = new Vector2(lastDir.x * Mathf.Cos(circleDir) - lastDir.y * Mathf.Sin(circleDir), lastDir.x * Mathf.Sin(circleDir) + lastDir.y * Mathf.Cos(circleDir));
-                }
+                StartCoroutine(AttackTimer());
+                hand.transform.rotation = (Quaternion.Euler(new Vector3(0, 0, Mathf.Atan2(targetVec.y, targetVec.x) * Mathf.Rad2Deg)));
             }
-            else if (distToTarget < optimalDist - distMargin)
+        }
+
+        if (isAttacking)
+        {
+            aDecay = (Time.time - aStart) / aTime * aSpeed;
+            rb.AddForce(aVec * (aSpeed - aDecay));
+        }
+        if (isChasing) {
+            if (distTarget - aDist < -marginDist)
             {
-                lastDir = -lastDir;
+                moveVec = -moveVec;
             }
 
-            rb.velocity = lastDir * baseSpeed;
+            if (Mathf.Abs(distTarget - aDist) < marginDist)
+            {
+                moveVec = new Vector2(moveVec.y, -moveVec.x);
+            }
+            
+            rb.velocity = moveVec * bSpeed;
         }
     }
 
-    private IEnumerator AttackTimer()
+
+    IEnumerator AttackTimer()
     {
-        hand.transform.rotation = Quaternion.Euler(new Vector3(0, 0, Mathf.Atan2(dirToTarget.y, dirToTarget.x) * Mathf.Rad2Deg));
-
-        isChasing = false;
+        aVec = moveVec;
+        rb.velocity = Vector2.zero;
         canAttack = false;
-
-        yield return new WaitForSeconds(attackDelay);
-        attackStart = Time.time;
+        isChasing = false;
+        yield return new WaitForSeconds(aDelay);
         isAttacking = true;
-        GameObject currentAttack = Instantiate(attack, weapon.transform);
-        
-        yield return new WaitForSeconds(attackTime);
+        aStart = Time.time;
+        aCurrent = Instantiate(attack, weapon.transform);
+        yield return new WaitForSeconds(aTime);
         isAttacking = false;
-        Destroy(currentAttack);
-        
-        yield return new WaitForSeconds(attackRecover);
+        Destroy(aCurrent);
+        yield return new WaitForSeconds(aRecover);
         isChasing = true;
-        
-        yield return new WaitForSeconds(attackCooldown);
+        yield return new WaitForSeconds(aCooldown);
         canAttack = true;
     }
 }

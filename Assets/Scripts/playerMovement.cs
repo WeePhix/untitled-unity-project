@@ -1,26 +1,22 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static DirectionManager;
 
-public class playerMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
-    private Vector2 movementInput;
+    private Vector2 movementInput, dVec;
+    private float dStart, dDecay;
+    private bool isDashing = false, canDash = true;
+
+    [SerializeField] private float bSpeed, dSpeed, dDelay, dTime, dCooldown;
+
     private Rigidbody2D rb;
-    private BoxCollider2D coll;
     private Controls controls;
-    private Vector3 dashDirection;
-    private float dashStart;
-    private float dashDecay;
-
-    [SerializeField]private bool canDash = true;
-    private bool isDashing = false;
-
-    [SerializeField] private float baseSpeed;
-    [SerializeField] private float dashSpeed;
-    [SerializeField] private float dashDelay;
-    [SerializeField] private float dashTime;
-    [SerializeField] private float dashCooldown;
+    private SpriteRenderer render;
+    private DirectionManager dirMan;
 
     private void Awake()
     {
@@ -40,40 +36,45 @@ public class playerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        coll = GetComponent<BoxCollider2D>();
+        dirMan = GetComponent<DirectionManager>();
+        render = GetComponent<SpriteRenderer>();
     }
 
 
     void Update()
     {
-        if (controls.PlayerInput.Dash.ReadValue<float>() == 1.0 && canDash)
+        movementInput = controls.PlayerInput.Movement.ReadValue<Vector2>().normalized;
+
+        if (controls.PlayerInput.Dash.ReadValue<float>() == 1.0 && canDash && movementInput != Vector2.zero)
         { 
             StartCoroutine(DashTimer());
-            Vector3 pointerPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-            dashDirection = pointerPos - transform.position;
-            dashDirection.z = 0;
-            dashDirection = dashDirection.normalized;
+            dVec = movementInput;
         }
+
         if (isDashing) 
         {
-            dashDecay = dashSpeed / dashTime * (Time.time - dashStart);
-            rb.AddForce(dashDirection * (dashSpeed - dashDecay));
+            dDecay = (Time.time - dStart) / dTime * dSpeed;
+            rb.AddForce(dVec * (dSpeed - dDecay));
+
         }
-        movementInput = controls.PlayerInput.Movement.ReadValue<Vector2>();
-        rb.velocity = movementInput * baseSpeed;
+
+
+        rb.velocity = movementInput * bSpeed;
+
+
     }
 
     private IEnumerator DashTimer()
     {
         controls.Disable();
         canDash = false;
-        yield return new WaitForSeconds(dashDelay);
-        dashStart = Time.time;
+        yield return new WaitForSeconds(dDelay);
+        dStart = Time.time;
         isDashing = true;
-        yield return new WaitForSeconds(dashTime);
+        yield return new WaitForSeconds(dTime);
         isDashing = false;
         controls.Enable();
-        yield return new WaitForSeconds(dashCooldown);
+        yield return new WaitForSeconds(dCooldown);
         canDash = true;
     }
 }
