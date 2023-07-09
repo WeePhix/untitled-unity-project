@@ -42,7 +42,7 @@ public class Spawn : MonoBehaviour
     IEnumerator SpawnBrawler()
     {
         canSpawn = false;
-        brawler = Instantiate(Brawler);
+        brawler = Instantiate(Brawler, transform);
         brawler.GetComponent<BrawlerAI>().target = player;
         yield return new WaitForSeconds(1);
         canSpawn = true;

@@ -8,7 +8,7 @@ using static DirectionManager;
 public class PlayerMovement : MonoBehaviour
 {
     private Vector2 movementInput, dVec;
-    private float dStart, dDecay;
+    private float dStart;
     private bool isDashing = false, canDash = true;
 
     [SerializeField] private float bSpeed, dSpeed, dDelay, dTime, dCooldown;
@@ -53,9 +53,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (isDashing) 
         {
-            dDecay = (Time.time - dStart) / dTime * dSpeed;
-            rb.AddForce(dVec * (dSpeed - dDecay));
-
+            rb.AddForce(dVec.normalized * dSpeed  * (1 - (Time.time - dStart) / dTime));
         }
 
 

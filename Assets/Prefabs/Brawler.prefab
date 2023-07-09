@@ -10,10 +10,13 @@ GameObject:
   m_Component:
   - component: {fileID: 1056970847089072171}
   - component: {fileID: 538871248519761151}
+  - component: {fileID: -2603294476602090090}
+  - component: {fileID: -6936750556196792967}
   - component: {fileID: 2039958001044284267}
   - component: {fileID: 3268019862655607665}
   - component: {fileID: 5944529430821543970}
   - component: {fileID: 9199481862419012766}
+  - component: {fileID: 7022023492021142775}
   m_Layer: 7
   m_Name: Brawler
   m_TagString: Untagged
@@ -29,13 +32,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1164400460913904191}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.559619, y: 0.28266463, z: 0}
-  m_LocalScale: {x: 1.25, y: 1.25, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.75, y: 0.75, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8417051495135755694}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &538871248519761151
 SpriteRenderer:
@@ -89,6 +92,32 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &-2603294476602090090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1164400460913904191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c484dbf03c2f2674599f9c56c40fce8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-6936750556196792967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1164400460913904191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d17b9672333934d45bf984c6033efc15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data: []
+  health: 3
 --- !u!114 &2039958001044284267
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,21 +143,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isChasing: 1
-  isAttacking: 0
-  canAttack: 1
+  isDashing: 0
+  canDashA: 1
+  canDashD: 1
+  canAttack: 0
   seesTarget: 0
   bSpeed: 3
-  aSpeed: 10
-  aDelay: 1
-  aTime: 0.4
-  aRecover: 0.3
-  aCooldown: 3
-  aDist: 3
+  dSpeed: 15
+  dDelay: 0.25
+  dTime: 0.5
+  dRecover: 0.2
+  dCooldown: 3
+  dSlowdown: 0
+  dDist: 2
   marginDist: 0.3
+  aDist: 1
+  aCooldown: 1
+  aDelay: 0.3
   target: {fileID: 0}
   hand: {fileID: 3481120505483623875}
   weapon: {fileID: 6340687177291868852}
-  attack: {fileID: 2470383900976187942, guid: 9a86c7bc68ff6f8408f5c0af76faacb5, type: 3}
+  dashAttack: {fileID: 2470383900976187942, guid: 9a86c7bc68ff6f8408f5c0af76faacb5, type: 3}
+  stillAttack: {fileID: 2470383900976187942, guid: 9a86c7bc68ff6f8408f5c0af76faacb5, type: 3}
+  death: {fileID: 3565956783152997483, guid: 5e913cc3f04d57e49af2a1b9f2cd6101, type: 3}
 --- !u!50 &5944529430821543970
 Rigidbody2D:
   serializedVersion: 4
@@ -171,7 +208,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -200,6 +237,51 @@ BoxCollider2D:
   m_AutoTiling: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
+--- !u!61 &7022023492021142775
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1164400460913904191}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.4, y: 0.4}
   m_EdgeRadius: 0
 --- !u!1 &3481120505483623875
 GameObject:
