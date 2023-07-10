@@ -7,10 +7,12 @@ public class BoltManager : MonoBehaviour
     public string[] data; // effect, cast type, level, damage
     public Vector2 fly;
 
+    private bool collided = false;
+
 
     void Start()
     {
-        
+        StartCoroutine(DeathTimer());
     }
 
 
@@ -19,11 +21,11 @@ public class BoltManager : MonoBehaviour
 
     }
 
-    private void OnTriggerEnter2D(Collider2D collider)
+    private IEnumerator DeathTimer()
     {
-        if (collider.gameObject.layer == 7)
+        yield return new WaitForSeconds(20);
+        if (!collided)
         {
-            collider.gameObject.GetComponent<EnemyManager>().data = data;
             Destroy(gameObject);
         }
     }

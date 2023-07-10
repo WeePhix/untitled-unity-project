@@ -59,15 +59,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\particlesDestroy.cs" />
+    <Compile Include="Assets\Scripts\Enemies\DirectionManager.cs" />
     <Compile Include="Assets\Scripts\Spawn.cs" />
     <Compile Include="Assets\Scripts\BoltManager.cs" />
-    <Compile Include="Assets\Scripts\DirectionManager.cs" />
-    <Compile Include="Assets\Scripts\playerWeapons.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI.cs" />
-    <Compile Include="Assets\Scripts\BrawlerAI.cs" />
-    <Compile Include="Assets\Scripts\EnemyManager.cs" />
-    <Compile Include="Assets\Scripts\Controls.cs" />
-    <Compile Include="Assets\Scripts\PlayerMovement.cs" />
+    <Compile Include="Assets\Scripts\Player\playerWeapons.cs" />
+    <Compile Include="Assets\Scripts\Enemies\EnemyManager.cs" />
+    <Compile Include="Assets\Scripts\Enemies\EnemyAI.cs" />
+    <Compile Include="Assets\Scripts\Enemies\BrawlerAI.cs" />
+    <Compile Include="Assets\Scripts\Player\Controls.cs" />
+    <Compile Include="Assets\Scripts\Player\PlayerMovement.cs" />
+    <Compile Include="Assets\Scripts\Player\PlayerOther.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
