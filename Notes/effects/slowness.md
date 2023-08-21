@@ -1,1 +1,0 @@
-if [[Charm]] and [[Curse]] are applied to the character, reduce their movement speed by the smaller of the percentages
